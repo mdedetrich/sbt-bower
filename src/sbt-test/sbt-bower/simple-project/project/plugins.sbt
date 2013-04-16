@@ -1,0 +1,1 @@
+addSbtPlugin("com.github.masseguillaume" % "sbt-bower" % "0.1-SNAPSHOT")
