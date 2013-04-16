@@ -10,7 +10,7 @@
 
 ### Example
 
-see src/sbt-test-/sbt-bower/simple-project/Build.scala
+see https://github.com/MasseGuillaume/sbt-bower/blob/master/src/sbt-test/sbt-bower/simple-project/project/Build.scala
 
 ## Commands
 
