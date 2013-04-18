@@ -1,2 +1,3 @@
-> bower-install
-$ exists components/jquery/jquery.js
+> bower:install
+$ exists src/webapp/components/jquery/jquery.js
+$ exists src/webapp/components/threejs
