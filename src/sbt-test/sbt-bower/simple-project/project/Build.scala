@@ -7,7 +7,7 @@ object SimpleBuild extends Build {
 		id = "Simple",
 		base = file("."),
 		settings = Project.defaultSettings ++ SbtBowerPlugin.bowerSettings ++ Seq(
-      BowerKeys.frontendDependencies ++= Seq(
+      		BowerKeys.frontendDependencies ++= Seq(
 				"jquery" `#` "1.9.1",
 				"threejs" HEAD
 			)

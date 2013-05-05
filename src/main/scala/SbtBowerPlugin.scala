@@ -15,7 +15,6 @@ object SbtBowerPlugin extends Plugin {
   import BowerKeys._
 
 	val install = TaskKey[Unit]("install","install frontend dependencies")
-
 	private def installTask: Project.Initialize[Task[Unit]] = (bowerPath, frontendDependencies, sourceDirectory, streams ) map { (bower, dependencies, source, s ) =>
 	  for { dependency <- dependencies } {
 	    s.log.info("installing %s".format(dependency.install) )
@@ -24,15 +23,21 @@ object SbtBowerPlugin extends Plugin {
 	  }
 	}
 
+  val list = TaskKey[Unit]("list","list all the packages that are installed locally")
+  private def listTask: Project.Initialize[Task[Unit]] = (bowerPath, streams) map { (bower, s) =>
+    Process( bower :: "install" :: Nil ) ! s.log
+  }
+
   lazy val bowerSettings: Seq[Setting[_]] = Seq(
     libraryDependencies in Bower := Seq.empty,
     frontendDependencies := Seq.empty,
     bowerPath := "/usr/local/share/npm/bin/bower",
-    sourceDirectory in Bower <<= (sourceDirectory) (_ / "webapp" )
+    sourceDirectory in Bower <<= (sourceDirectory) (_ / "main" / "webapp" )
   )
 
-  override lazy val projectSettings: Seq[Setting[_]] = inConfig(Bower) (Seq (
-    install <<= installTask
+  override lazy val settings: Seq[Setting[_]] = inConfig(Bower) (Seq (
+    install <<= installTask,
+    list <<= listTask
   ))
 
   implicit def toFrontendDependency( artifactName: String ) = new FrontendDependency( artifactName )
