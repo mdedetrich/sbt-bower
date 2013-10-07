@@ -33,7 +33,7 @@ object SbtBowerPlugin extends Plugin {
   lazy val bowerSettings: Seq[Setting[_]] = Seq(
     libraryDependencies in Bower := Seq.empty,
     frontendDependencies := Seq.empty,
-    bowerPath := "/usr/local/share/npm/bin/bower"
+    bowerPath := "/usr/local/share/npm/bin/bower",
     sourceDirectory in Bower <<= (sourceDirectory).apply (_ / "main" / "webapp" )
   )
 
