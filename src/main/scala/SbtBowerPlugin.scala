@@ -14,8 +14,10 @@ object SbtBowerPlugin extends Plugin {
 
   import BowerKeys._
 
-	val install = TaskKey[Unit]("install","install frontend dependencies")
-	private def installTask: Project.Initialize[Task[Unit]] = (bowerPath, frontendDependencies, sourceDirectory, streams ) map { (bower, dependencies, source, s ) =>
+  implicit def toFrontendDependency( artifactName: String ) = new FrontendDependency( artifactName )
+
+  val install = TaskKey[Unit]("install","install frontend dependencies")
+	private def installTask: Def.Initialize[Task[Unit]] = (bowerPath, frontendDependencies, sourceDirectory, streams ) map { (bower, dependencies, source, s ) =>
 	  for { dependency <- dependencies } {
 	    s.log.info("installing %s".format(dependency.install) )
       createDirectory( source )
@@ -24,15 +26,15 @@ object SbtBowerPlugin extends Plugin {
 	}
 
   val list = TaskKey[Unit]("list","list all the packages that are installed locally")
-  private def listTask: Project.Initialize[Task[Unit]] = (bowerPath, streams) map { (bower, s) =>
+  private def listTask: Def.Initialize[Task[Unit]] = (bowerPath, streams) map { (bower, s) =>
     Process( bower :: "install" :: Nil ) ! s.log
   }
 
   lazy val bowerSettings: Seq[Setting[_]] = Seq(
     libraryDependencies in Bower := Seq.empty,
     frontendDependencies := Seq.empty,
-    bowerPath := "/usr/local/share/npm/bin/bower",
-    sourceDirectory in Bower <<= (sourceDirectory) (_ / "main" / "webapp" )
+    bowerPath := "/usr/local/share/npm/bin/bower"
+    sourceDirectory in Bower <<= (sourceDirectory).apply (_ / "main" / "webapp" )
   )
 
   override lazy val settings: Seq[Setting[_]] = inConfig(Bower) (Seq (
@@ -40,7 +42,6 @@ object SbtBowerPlugin extends Plugin {
     list <<= listTask
   ))
 
-  implicit def toFrontendDependency( artifactName: String ) = new FrontendDependency( artifactName )
 }
 
 class FrontendDependency( artifactName: String ) {
