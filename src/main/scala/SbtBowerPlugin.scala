@@ -4,7 +4,7 @@ import IO._
 
 
 object BowerKeys {
-  val Bower = config("bower") extend (Compile)
+  val Bower = config("bower") extend Compile
   val frontendDependencies = SettingKey[Seq[FrontendDependency]]("frontend-dependency","frontend dependencies to resolve with bower")
   val bowerPath = SettingKey[String]("bower-path","where bower is installed")
 }
