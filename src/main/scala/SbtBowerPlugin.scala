@@ -1,6 +1,5 @@
 import sbt._
 import Keys._
-import Path._
 import IO._
 
 
