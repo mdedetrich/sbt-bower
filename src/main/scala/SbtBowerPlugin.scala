@@ -34,7 +34,7 @@ object SbtBowerPlugin extends Plugin {
     libraryDependencies in Bower := Seq.empty,
     frontendDependencies := Seq.empty,
     bowerPath := "/usr/local/share/npm/bin/bower",
-    sourceDirectory in Bower <<= sourceDirectory.apply (_ / "main" / "webapp" )
+    sourceDirectory in Bower <<= sourceDirectory (_ / "main" / "webapp" )
   )
 
   override lazy val settings: Seq[Setting[_]] = inConfig(Bower) (Seq (
