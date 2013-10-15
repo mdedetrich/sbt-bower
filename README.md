@@ -83,7 +83,7 @@ Allows you to search [bower] for a package, as well as checking if the package h
 
 ## Notes
 
-sbt-bower uses the PATH environment variable to locate the bower binary. If you run SBT from a
+sbt-bower uses the PATH environment variable to locate the [bower] binary. If you run SBT from a
 shell/command prompt it should work fine (assuming [node]/[npm] and [bower] are properly set up), however
 if you happen to be using the [IntelliJ SBT Plugin], due to this [bug] then you need to resort to
 using a proper terminal
