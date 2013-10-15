@@ -10,6 +10,9 @@ object SbtBowerBuild extends Build with BuildExtra {
 		name := "sbt-bower",
 		organization := "com.mdedetrich",
 		version := "0.2.0-SNAPSHOT",
-		scalacOptions ++= Seq("-deprecation", "-unchecked")
+		scalacOptions ++= Seq("-deprecation", "-unchecked"),
+    libraryDependencies ++= Seq(
+      "org.json4s" %% "json4s-native" % "3.2.5"
+    )
   )
 }

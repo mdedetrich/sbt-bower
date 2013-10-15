@@ -1,12 +1,14 @@
 import sbt._
 import Keys._
-import IO._
+import org.json4s._
+import org.json4s.native.JsonMethods._
+import org.json4s.JsonDSL._
 
 
 object BowerKeys {
   val Bower = config("bower") extend Compile
   val frontendDependencies = SettingKey[Seq[FrontendDependency]]("frontend-dependency","frontend dependencies to resolve with bower")
-  val bowerPath = SettingKey[String]("bower-path","where bower is installed")
+  val installDirectory = SettingKey[File]("install-directory","where js libraries are installed relative to source directory")
 }
 
 object SbtBowerPlugin extends Plugin {
@@ -15,40 +17,60 @@ object SbtBowerPlugin extends Plugin {
 
   implicit def toFrontendDependency( artifactName: String ) = new FrontendDependency( artifactName )
 
+
+  lazy val setupFilesTask = Def.task {
+    val bowerRC = (sourceDirectory in Bower).value / ".bowerrc"
+    val bowerJSON = (sourceDirectory in Bower).value / "bower.json"
+    val installDirectoryPath = (sourceDirectory in Bower).value.relativize((installDirectory in Bower).value)
+    val fileContents =
+      ("directory" -> (installDirectoryPath.head.getPath))
+    IO.write(bowerRC,compact(render(fileContents)))
+    val dependencies = JObject(frontendDependencies.value.map(_.install).toList)
+    val json =(
+      ("name" -> name.value) ~
+        ("version" -> version.value) ~
+        ("devDependencies" -> dependencies)
+      )
+    IO.write(bowerJSON,compact(render(json)))
+    (bowerRC,bowerJSON)
+  }
+
+  lazy val installTask = Def.task {
+    val files = setupFilesTask.value
+    val (bowerRC,bowerJSON) = files
+    Process( "bower" :: "install" :: Nil, (sourceDirectory in Bower).value ) ! streams.value.log
+    IO.delete(bowerRC)
+    IO.delete(bowerJSON)
+  }
+
   val install = TaskKey[Unit]("install","install frontend dependencies")
-	private def installTask: Def.Initialize[Task[Unit]] = (bowerPath, frontendDependencies, sourceDirectory, streams ) map { (bower, dependencies, source, s ) =>
-	  for { dependency <- dependencies } {
-	    s.log.info("installing %s".format(dependency.install) )
-      createDirectory( source )
-	    Process( bower :: "install" :: dependency.install :: Nil, source ) ! s.log
-	  }
-	}
+
+
+  lazy val listTask = Def.task {
+    val files = setupFilesTask.value
+    val (bowerRC,bowerJSON) = files
+    Process("bower" :: "list" :: Nil, (sourceDirectory in Bower).value) ! streams.value.log
+    IO.delete(bowerRC)
+    IO.delete(bowerJSON)
+  }
 
   val list = TaskKey[Unit]("list","list all the packages that are installed locally")
-  private def listTask: Def.Initialize[Task[Unit]] = (bowerPath, streams) map { (bower, s) =>
-    Process( bower :: "install" :: Nil ) ! s.log
-  }
 
   lazy val bowerSettings: Seq[Setting[_]] = Seq(
     libraryDependencies in Bower := Seq.empty,
     frontendDependencies := Seq.empty,
-    bowerPath := "/usr/local/share/npm/bin/bower",
-    sourceDirectory in Bower <<= sourceDirectory (_ / "main" / "webapp" )
+    sourceDirectory in Bower <<= sourceDirectory (_ / "main" / "webapp" ),
+    installDirectory in Bower <<= (sourceDirectory in Bower) (_ / "js" / "lib"),
+    install in Bower := installTask.value,
+    list in Bower := listTask.value
   )
-
-  override lazy val settings: Seq[Setting[_]] = inConfig(Bower) (Seq (
-    install <<= installTask,
-    list <<= listTask
-  ))
-
 }
 
-class FrontendDependency( artifactName: String ) {
-	def `#` ( revision: String ) = new FrontendDependencyWithRevision( artifactName, revision )
-	def HEAD = this
-	def install = artifactName
+class FrontendDependency( artifactName: String) {
+	def %%% ( revision: String ) = new FrontendDependencyWithRevision(artifactName, revision )
+  def install:JField = throw new IllegalArgumentException("Must provide a version")
 }
 
 class FrontendDependencyWithRevision( artifactName: String, revision: String ) extends FrontendDependency( artifactName ) {
-  override def install = "%s#%s".format( super.install, revision )
+  override def install = JField(artifactName,JString(revision))
 }
