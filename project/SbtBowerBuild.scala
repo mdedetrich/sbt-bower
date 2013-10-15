@@ -3,7 +3,7 @@ import Keys._
 
 object SbtBowerBuild extends Build with BuildExtra {
 
-	lazy val sbtBower = Project("sbt-bower", file("."), settings = mainSettings)
+  lazy val sbtBower = Project("sbt-bower", file("."), settings = mainSettings)
 
 	lazy val mainSettings: Seq[Def.Setting[_]] = Defaults.defaultSettings ++ Seq(
 		sbtPlugin := true,
@@ -15,4 +15,12 @@ object SbtBowerBuild extends Build with BuildExtra {
       "org.json4s" %% "json4s-native" % "3.2.5"
     )
   )
+
+  publishTo := {
+    val nexus = "https://oss.sonatype.org/"
+    if (version.value.trim.endsWith("SNAPSHOT"))
+      Some("snapshots" at nexus + "content/repositories/snapshots")
+    else
+      Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+  }
 }

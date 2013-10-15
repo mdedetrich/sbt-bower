@@ -4,7 +4,6 @@ import org.json4s._
 import org.json4s.native.JsonMethods._
 import org.json4s.JsonDSL._
 
-
 object BowerKeys {
   val Bower = config("bower") extend Compile
   val frontendDependencies = SettingKey[Seq[FrontendDependency]]("frontend-dependency","frontend dependencies to resolve with bower")
@@ -38,6 +37,7 @@ object SbtBowerPlugin extends Plugin {
   lazy val installTask = Def.task {
     val files = setupFilesTask.value
     val (bowerRC,bowerJSON) = files
+    streams.value.log.info("Checking/installing bower dependencies")
     Process( "bower" :: "install" :: Nil, (sourceDirectory in Bower).value ) ! streams.value.log
     IO.delete(bowerRC)
     IO.delete(bowerJSON)
@@ -49,12 +49,15 @@ object SbtBowerPlugin extends Plugin {
   lazy val listTask = Def.task {
     val files = setupFilesTask.value
     val (bowerRC,bowerJSON) = files
+    streams.value.log.info("Listing bower dependencies")
     Process("bower" :: "list" :: Nil, (sourceDirectory in Bower).value) ! streams.value.log
     IO.delete(bowerRC)
     IO.delete(bowerJSON)
   }
 
   val list = TaskKey[Unit]("list","list all the packages that are installed locally")
+  val rawr = TaskKey[Unit]("rawr", "list rawr")
+
 
   lazy val bowerSettings: Seq[Setting[_]] = Seq(
     libraryDependencies in Bower := Seq.empty,
