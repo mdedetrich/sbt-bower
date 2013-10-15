@@ -81,9 +81,6 @@ Will list the currently installed bower packages
 * [ ] search
 Allows you to search [bower] for a package, as well as checking if the package has updated or not
 
-
-* [ ] uninstall
-
 ## Notes
 
 sbt-bower uses the PATH environment variable to locate the bower binary. If you run SBT from a
