@@ -1,4 +1,0 @@
-//	val list = TaskKey[Unit]("list","list all the packages that are installed locally")
-//	val search = TaskKey[Unit]("search","search for packages registered with Bower")
-//	val uninstall = TaskKey[Unit]("uninstall","uninstall a locally installed package")
-//	val register = TaskKey[Unit]("register","register a package into the Bower global repository")
