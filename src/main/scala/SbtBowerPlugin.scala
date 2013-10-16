@@ -83,6 +83,17 @@ object SbtBowerPlugin extends Plugin {
 
   val search = InputKey[Unit]("search","searches bower packages")
 
+  lazy val infoTask = Def.inputTask {
+    val files = setupFilesTask.value
+    val (bowerRC,bowerJSON) = files
+    val query:String = stringInput.parsed
+    Process("bower" :: "info" :: query :: Nil,(sourceDirectory in Bower).value) ! streams.value.log
+    IO.delete(bowerRC)
+    IO.delete(bowerJSON)
+  }
+
+  lazy val info = InputKey[Unit]("info","provides info on a bower package")
+
   lazy val bowerSettings: Seq[Setting[_]] = Seq(
     libraryDependencies in Bower := Seq.empty,
     frontendDependencies := Seq.empty,
@@ -91,8 +102,10 @@ object SbtBowerPlugin extends Plugin {
     install in Bower := installTask.value,
     list in Bower := listTask.value,
     prune in Bower := pruneTask.value,
-    search in Bower := searchTask.value.evaluated
+    search in Bower := searchTask.value.evaluated,
+    info in Bower := searchTask.value.evaluated
   )
+
 }
 
 class FrontendDependency( artifactName: String) {

@@ -67,20 +67,6 @@ it just needs to exist and its often just the generic "assets" folder for your w
 [bower]: http://bower.io/
 [xbst-web-plugin]: https://github.com/JamesEarlDouglas/xsbt-web-plugin
 
-## Commands
-* [ ] install
-Checks the currently installed bower dependencies in `BowerKeys.installationDirectory` against the the ones
-specified in `BowerKeys.frontendDependencies`. If there are no changes, then nothing is done. If a dependency/s
-version is changed, than [bower] will update the package, and if there are added dependencies then
-[bower] will automatically download them
-* [ ] prune
-Will clean any installed dependencies that have been removed from `BowerKeys.frontendDependencies` but still exist
-in `BowerKeys.installationDirectory`.
-* [ ] list
-Will list the currently installed bower packages
-* [ ] search
-Allows you to search [bower] for a package, as well as checking if the package has updated or not
-
 ## Notes
 
 sbt-bower uses the PATH environment variable to locate the [bower] binary. If you run SBT from a
