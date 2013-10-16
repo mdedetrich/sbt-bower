@@ -103,7 +103,7 @@ object SbtBowerPlugin extends Plugin {
     list in Bower := listTask.value,
     prune in Bower := pruneTask.value,
     search in Bower := searchTask.value.evaluated,
-    info in Bower := searchTask.value.evaluated
+    info in Bower := infoTask.value.evaluated
   )
 
 }
