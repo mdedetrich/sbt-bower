@@ -76,7 +76,7 @@ object SbtBowerPlugin extends Plugin {
     val files = setupFilesTask.value
     val (bowerRC,bowerJSON) = files
     val query: String = stringInput.parsed
-    Process("bower" :: "list" :: query :: Nil,(sourceDirectory in Bower).value) ! streams.value.log
+    Process("bower" :: "search" :: query :: Nil,(sourceDirectory in Bower).value) ! streams.value.log
     IO.delete(bowerRC)
     IO.delete(bowerJSON)
   }
