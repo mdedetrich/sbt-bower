@@ -70,7 +70,7 @@ object SbtBowerPlugin extends Plugin {
 
   val prune = TaskKey[Unit]("prune","removes packages from installDirectory that no longer exist in frontendDependencies")
 
-  val stringInput: Parser[String] = Space ~> StringBasic.examples("<query>")
+  val stringInput: Parser[String] = Space ~> StringBasic.examples("<package>")
 
   lazy val searchTask = Def.inputTask {
     val files = setupFilesTask.value
