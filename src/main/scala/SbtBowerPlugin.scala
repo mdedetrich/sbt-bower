@@ -70,12 +70,12 @@ object SbtBowerPlugin extends Plugin {
 
   val prune = TaskKey[Unit]("prune","removes packages from installDirectory that no longer exist in frontendDependencies")
 
-  val stringInput: Parser[String] = Space ~> StringBasic.examples("<package>")
+  val packageQuery: Parser[String] = Space ~> StringBasic.examples("<package>")
 
   lazy val searchTask = Def.inputTask {
     val files = setupFilesTask.value
     val (bowerRC,bowerJSON) = files
-    val query: String = stringInput.parsed
+    val query: String = packageQuery.parsed
     Process("bower" :: "search" :: query :: Nil,(sourceDirectory in Bower).value) ! streams.value.log
     IO.delete(bowerRC)
     IO.delete(bowerJSON)
@@ -86,13 +86,24 @@ object SbtBowerPlugin extends Plugin {
   lazy val infoTask = Def.inputTask {
     val files = setupFilesTask.value
     val (bowerRC,bowerJSON) = files
-    val query:String = stringInput.parsed
+    val query:String = packageQuery.parsed
     Process("bower" :: "info" :: query :: Nil,(sourceDirectory in Bower).value) ! streams.value.log
     IO.delete(bowerRC)
     IO.delete(bowerJSON)
   }
 
   lazy val info = InputKey[Unit]("info","provides info on a bower package")
+
+  lazy val uninstallTask = Def.inputTask {
+    val files = setupFilesTask.value
+    val (bowerRC,bowerJSON) = files
+    val query:String = packageQuery.parsed
+    Process("bower" :: "uninstall" :: query :: Nil,(sourceDirectory in Bower).value) ! streams.value.log
+    IO.delete(bowerRC)
+    IO.delete(bowerJSON)
+  }
+
+  val uninstall = InputKey[Unit]("uninstall","uninstall a bower package")
 
   lazy val bowerSettings: Seq[Setting[_]] = Seq(
     libraryDependencies in Bower := Seq.empty,
@@ -103,7 +114,8 @@ object SbtBowerPlugin extends Plugin {
     list in Bower := listTask.value,
     prune in Bower := pruneTask.value,
     search in Bower := searchTask.value.evaluated,
-    info in Bower := infoTask.value.evaluated
+    info in Bower := infoTask.value.evaluated,
+    uninstall in Bower := uninstallTask.value.evaluated
   )
 
 }
