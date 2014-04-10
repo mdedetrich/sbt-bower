@@ -23,25 +23,27 @@ addSbtPlugin("com.mdedetrich" %% "sbt-bower" % "0.2.0")
 In your `build.sbt` file, put
 
 ```scala
-    seq(bowerSettings : _*)
+seq(bowerSettings : _*)
 ```
 
 Now we need to simply setup our dependencies in `build.sbt` which follow a similar format to then `bower.json` format.
 Here is an example of such a configuration
 
-    BowerKeys.frontendDependencies ++= Seq(
-      "angular" %%% "=1.2.0-rc.2",
-      "angular-scenario" %%% "=1.2.0-rc.2",
-      "angular-route" %%% "=1.2.0-rc.2",
-      "angular-mocks" %%% "=1.2.0-rc.2",
-      "angular-animate" %%% "=1.2.0-rc.2",
-      "angular-cookies" %%% "=1.2.0-rc.2",
-      "angular-resource" %%% "=1.2.0-rc.2",
-      "angular-sanitize" %%% "=1.2.0-rc.2",
-      "angular-touch" %%% "=1.2.0-rc.2",
-      "requirejs" %%% "=2.1.8",
-      "requirejs-text" %%% "2.0.10"
-    )
+```scala
+BowerKeys.frontendDependencies ++= Seq(
+  "angular" %%% "=1.2.0-rc.2",
+  "angular-scenario" %%% "=1.2.0-rc.2",
+  "angular-route" %%% "=1.2.0-rc.2",
+  "angular-mocks" %%% "=1.2.0-rc.2",
+  "angular-animate" %%% "=1.2.0-rc.2",
+  "angular-cookies" %%% "=1.2.0-rc.2",
+  "angular-resource" %%% "=1.2.0-rc.2",
+  "angular-sanitize" %%% "=1.2.0-rc.2",
+  "angular-touch" %%% "=1.2.0-rc.2",
+  "requirejs" %%% "=2.1.8",
+  "requirejs-text" %%% "2.0.10"
+)
+```
 
 Note that since we use the official [bower] binary, the versioning will follow the exact same semantics
 documented on the [bower] page.
@@ -52,8 +54,10 @@ have a project which uses the [xbst-web-plugin]. The installation directory defa
 `(sourceDirectory in Bower) (_ / "js" / "lib")`. These directories can be changed in build.sbt by doing
 the following
 
-    BowerKeys.sourceDirectory <<= sourceDirectory (_ / "main" / "assets" )
-    BowerKeys.installationDirectory <<=  (sourceDirectory in Bower) (_ / "js" / "myStuffGoesHere")
+```scala
+BowerKeys.sourceDirectory <<= sourceDirectory (_ / "main" / "assets" )
+BowerKeys.installationDirectory <<=  (sourceDirectory in Bower) (_ / "js" / "myStuffGoesHere")
+```
 
 That's it, we now have now setup the plugin!
 
@@ -63,7 +67,9 @@ We can set up SBT to automatically check our frontend dependencies when SBT star
 exact same way it checks for our scala/java dependencies. To do this, we just modify the
 update task. Place the following in your `build.sbt`
 
-    update <<= update dependsOn (installTask dependsOn(pruneTask))
+```scala
+update <<= update dependsOn (installTask dependsOn(pruneTask))
+```
 
 This will run the `bower:prune` and `bower:install` tasks when SBT starts which checks if you
 currently have your frontend dependencies installed and update them should they have changed.
