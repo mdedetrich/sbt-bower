@@ -6,14 +6,25 @@
 [bower]: http://bower.io/
 
 # Installation
-First make sure you have [bower] installed, do this by using [node.js] [npm]. Then simply place
-this in your `plugins/build.sbt` file
+First make sure you have [bower] installed, do this by using [node.js] [npm].
 
-    addSbtPlugin("com.mdedetrich" %% "sbt-bower" % "0.2.0-SNAPSHOT")
+Add the following resolvers to your `project/build.sbt` file
+
+```scala
+resolvers ++= Seq("mdedetrich-releases" at "http://artifactory.mdedetrich.com/plugins-release")
+```
+
+Then simply place this in your `project/build.sbt` file
+
+```scala
+addSbtPlugin("com.mdedetrich" %% "sbt-bower" % "0.2.0")
+```
 
 In your `build.sbt` file, put
 
+```scala
     seq(bowerSettings : _*)
+```
 
 Now we need to simply setup our dependencies in `build.sbt` which follow a similar format to then `bower.json` format.
 Here is an example of such a configuration
