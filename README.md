@@ -17,7 +17,7 @@ resolvers ++= Seq("mdedetrich-releases" at "http://artifactory.mdedetrich.com/pl
 Then simply place this in your `project/build.sbt` file
 
 ```scala
-addSbtPlugin("com.mdedetrich" %% "sbt-bower" % "0.2.0")
+addSbtPlugin("com.mdedetrich" %% "sbt-bower" % "0.2.1")
 ```
 
 In your `build.sbt` file, put
