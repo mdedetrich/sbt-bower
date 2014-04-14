@@ -1,7 +1,7 @@
 import sbt._
 import Keys._
 import org.json4s._
-import org.json4s.native.JsonMethods._
+import org.json4s.jackson.JsonMethods._
 import org.json4s.JsonDSL._
 import complete.DefaultParsers._
 import sbt.complete.Parser
@@ -25,14 +25,12 @@ object SbtBowerPlugin extends Plugin {
     val bowerJSON = (sourceDirectory in Bower).value / "bower.json"
     val installDirectoryPath = (sourceDirectory in Bower).value.relativize((installDirectory in Bower).value)
     val fileContents =
-      ("directory" -> (installDirectoryPath.head.getPath))
+      "directory" -> installDirectoryPath.head.getPath
     IO.write(bowerRC,compact(render(fileContents)))
     val dependencies = JObject(frontendDependencies.value.map(_.install).toList)
-    val json =(
-      ("name" -> name.value) ~
-        ("version" -> version.value) ~
-        ("devDependencies" -> dependencies)
-      )
+    val json = ("name" -> name.value) ~
+      ("version" -> version.value) ~
+      ("devDependencies" -> dependencies)
     IO.write(bowerJSON,compact(render(json)))
     (bowerRC,bowerJSON)
   }
