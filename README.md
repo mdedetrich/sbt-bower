@@ -5,19 +5,19 @@
 [Simple Build Tool]: http://simple-build-tool.googlecode.com
 [bower]: http://bower.io/
 
+# NOTE
+
+This library is no longer maintained, since the [Webjars](http://www.webjars.org/) [bower](http://www.webjars.org/bower) project
+provides a far superior method of using bower dependencies for Scala projects. Would highly recommend checking it out/converting.
+
 # Installation
-First make sure you have [bower] installed, do this by using [node.js] [npm].
-
-Add the following resolvers to your `project/build.sbt` file
-
-```scala
-resolvers ++= Seq("mdedetrich-releases" at "http://artifactory.mdedetrich.com/plugins-release")
-```
+First make sure you have [bower] installed, do this by using [node.js] [npm]. The artifacts are hosted on Sonatype, so
+you shouldn't need to add any repositories
 
 Then simply place this in your `project/build.sbt` file
 
 ```scala
-addSbtPlugin("com.mdedetrich" %% "sbt-bower" % "0.2.1")
+addSbtPlugin("org.mdedetrich" %% "sbt-bower" % "0.2.1")
 ```
 
 In your `build.sbt` file, put

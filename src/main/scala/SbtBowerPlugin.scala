@@ -6,6 +6,8 @@ import org.json4s.JsonDSL._
 import complete.DefaultParsers._
 import sbt.complete.Parser
 
+import scala.language.implicitConversions
+
 object BowerKeys {
   val Bower = config("bower") extend Compile
   val frontendDependencies = SettingKey[Seq[FrontendDependency]]("frontend-dependency","frontend dependencies to resolve with bower")
@@ -17,7 +19,7 @@ object SbtBowerPlugin extends Plugin {
 
   import BowerKeys._
 
-  implicit def toFrontendDependency( artifactName: String ) = new FrontendDependency( artifactName )
+  implicit def toFrontendDependency( artifactName: String ): FrontendDependency = new FrontendDependency( artifactName )
 
 
   lazy val setupFilesTask = Def.task {
