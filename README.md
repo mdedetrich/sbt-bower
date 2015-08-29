@@ -56,7 +56,7 @@ the following
 
 ```scala
 BowerKeys.sourceDirectory <<= sourceDirectory (_ / "main" / "assets" )
-BowerKeys.installDirectory <<=  (sourceDirectory in Bower) (_ / "js" / "myStuffGoesHere")
+BowerKeys.installDirectory <<=  (sourceDirectory in BowerKeys.Bower) (_ / "js" / "myStuffGoesHere")
 ```
 
 That's it, we now have now setup the plugin!
