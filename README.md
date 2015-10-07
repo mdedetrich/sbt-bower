@@ -48,6 +48,15 @@ BowerKeys.frontendDependencies ++= Seq(
 Note that since we use the official [bower] binary, the versioning will follow the exact same semantics
 documented on the [bower] page.
 
+We can also specify hook scripts to run like this:
+
+hookScripts in Bower ++= Seq(
+  PostInstall := "bower-requirejs -c ./requirejs.config.js"
+)
+
+Valid script types are (PreInstall, PostInstall, PreUnInstall)
+
+
 The last thing we need to do is to setup the [bower] source directories and installation directory.
 By default the source directory is `sourceDirectory (_ / "main" / "webapp" )` which implies you
 have a project which uses the [xbst-web-plugin]. The installation directory defaults to
@@ -55,8 +64,8 @@ have a project which uses the [xbst-web-plugin]. The installation directory defa
 the following
 
 ```scala
-BowerKeys.sourceDirectory <<= sourceDirectory (_ / "main" / "assets" )
-BowerKeys.installDirectory <<=  (sourceDirectory in Bower) (_ / "js" / "myStuffGoesHere")
+sourceDirectory <<= sourceDirectory (_ / "main" / "assets" )
+installDirectory <<=  (sourceDirectory in Bower) (_ / "js" / "myStuffGoesHere")
 ```
 
 That's it, we now have now setup the plugin!

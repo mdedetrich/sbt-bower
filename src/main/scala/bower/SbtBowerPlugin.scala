@@ -1,5 +1,7 @@
+package bower
+
 import sbt._
-import Keys._
+import sbt.Keys._
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import org.json4s.JsonDSL._
@@ -8,7 +10,7 @@ import sbt.complete.Parser
 
 import scala.language.implicitConversions
 
-object BowerKeys {
+object Keys {
   import SbtBowerPlugin.FrontendDependency
   import SbtBowerPlugin.ScriptType
   import SbtBowerPlugin.ScriptDefinition
@@ -16,7 +18,7 @@ object BowerKeys {
   val Bower = config("bower") extend Compile
   val frontendDependencies = SettingKey[Seq[FrontendDependency]]("frontend-dependency","frontend dependencies to resolve with bower")
   val installDirectory = SettingKey[File]("install-directory","where js libraries are installed relative to source directory")
-  val scripts = SettingKey[Seq[ScriptDefinition]]("bower-scripts", "bower script hooks")
+  val hookScripts = SettingKey[Seq[ScriptDefinition]]("bower-scripts", "bower script hooks")
 
   val PostInstall = ScriptType.PostInstall
   val PreInstall = ScriptType.PreInstall
@@ -25,7 +27,7 @@ object BowerKeys {
 
 object SbtBowerPlugin extends Plugin {
 
-  import BowerKeys._
+  import bower.Keys._
 
   lazy val setupFilesTask = Def.task {
     val bowerRC = (sourceDirectory in Bower).value / ".bowerrc"
@@ -33,7 +35,7 @@ object SbtBowerPlugin extends Plugin {
     val installDirectoryPath = (sourceDirectory in Bower).value.relativize((installDirectory in Bower).value)
     val fileContents = JObject(
       "directory" -> installDirectoryPath.head.getPath,
-      "scripts" -> JObject((scripts in Bower).value.map(_.evaluate).toList)
+      "scripts" -> JObject((hookScripts in Bower).value.map(_.evaluate).toList)
     )
     IO.write(bowerRC,compact(render(fileContents)))
     val dependencies = JObject(frontendDependencies.value.map(_.install).toList)
@@ -115,7 +117,7 @@ object SbtBowerPlugin extends Plugin {
   lazy val bowerSettings: Seq[Setting[_]] = Seq(
     libraryDependencies in Bower := Seq.empty,
     frontendDependencies := Seq.empty,
-    scripts in Bower := Seq.empty,
+    hookScripts in Bower := Seq.empty,
     sourceDirectory in Bower <<= sourceDirectory (_ / "main" / "webapp" ),
     installDirectory in Bower <<= (sourceDirectory in Bower) (_ / "js" / "lib"),
     install in Bower := installTask.value,
