@@ -9,25 +9,32 @@ import sbt.complete.Parser
 import scala.language.implicitConversions
 
 object BowerKeys {
+  import SbtBowerPlugin.FrontendDependency
+  import SbtBowerPlugin.ScriptType
+  import SbtBowerPlugin.ScriptDefinition
+
   val Bower = config("bower") extend Compile
   val frontendDependencies = SettingKey[Seq[FrontendDependency]]("frontend-dependency","frontend dependencies to resolve with bower")
   val installDirectory = SettingKey[File]("install-directory","where js libraries are installed relative to source directory")
-  val sourceDirectory = SettingKey[File]("source-directory","the base source directory, often the assets folder for web applications")
+  val scripts = SettingKey[Seq[ScriptDefinition]]("bower-scripts", "bower script hooks")
+
+  val PostInstall = ScriptType.PostInstall
+  val PreInstall = ScriptType.PreInstall
+  val PreUnInstall = ScriptType.PreUnInstall
 }
 
 object SbtBowerPlugin extends Plugin {
 
   import BowerKeys._
 
-  implicit def toFrontendDependency( artifactName: String ): FrontendDependency = new FrontendDependency( artifactName )
-
-
   lazy val setupFilesTask = Def.task {
     val bowerRC = (sourceDirectory in Bower).value / ".bowerrc"
     val bowerJSON = (sourceDirectory in Bower).value / "bower.json"
     val installDirectoryPath = (sourceDirectory in Bower).value.relativize((installDirectory in Bower).value)
-    val fileContents =
-      "directory" -> installDirectoryPath.head.getPath
+    val fileContents = JObject(
+      "directory" -> installDirectoryPath.head.getPath,
+      "scripts" -> JObject((scripts in Bower).value.map(_.evaluate).toList)
+    )
     IO.write(bowerRC,compact(render(fileContents)))
     val dependencies = JObject(frontendDependencies.value.map(_.install).toList)
     val json = ("name" -> name.value) ~
@@ -108,6 +115,7 @@ object SbtBowerPlugin extends Plugin {
   lazy val bowerSettings: Seq[Setting[_]] = Seq(
     libraryDependencies in Bower := Seq.empty,
     frontendDependencies := Seq.empty,
+    scripts in Bower := Seq.empty,
     sourceDirectory in Bower <<= sourceDirectory (_ / "main" / "webapp" ),
     installDirectory in Bower <<= (sourceDirectory in Bower) (_ / "js" / "lib"),
     install in Bower := installTask.value,
@@ -118,13 +126,31 @@ object SbtBowerPlugin extends Plugin {
     uninstall in Bower := uninstallTask.value.evaluated
   )
 
+  class ScriptDefinition(scriptType: ScriptType, value: String) {
+    def evaluate = JField(scriptType.value, value)
+  }
+
+  sealed trait ScriptType {
+    val value: String
+    def :=(script: String) = new ScriptDefinition(this, script)
+  }
+
+  object ScriptType {
+    case object PreInstall extends ScriptType { val value = "preinstall" }
+    case object PostInstall extends ScriptType { val value = "postinstall" }
+    case object PreUnInstall extends ScriptType { val value = "preuninstall" }
+  }
+
+  final implicit def toFrontendDependency( artifactName: String ): FrontendDependency = new FrontendDependency( artifactName )
+
+  class FrontendDependency( artifactName: String) {
+    def %%% ( revision: String ) = new FrontendDependencyWithRevision(artifactName, revision )
+    def install:JField = throw new IllegalArgumentException("Must provide a version")
+  }
+
+  final class FrontendDependencyWithRevision( artifactName: String, revision: String ) extends FrontendDependency( artifactName ) {
+    override def install = JField(artifactName,JString(revision))
+  }
+
 }
 
-class FrontendDependency( artifactName: String) {
-	def %%% ( revision: String ) = new FrontendDependencyWithRevision(artifactName, revision )
-  def install:JField = throw new IllegalArgumentException("Must provide a version")
-}
-
-class FrontendDependencyWithRevision( artifactName: String, revision: String ) extends FrontendDependency( artifactName ) {
-  override def install = JField(artifactName,JString(revision))
-}
